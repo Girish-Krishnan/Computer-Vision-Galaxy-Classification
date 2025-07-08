@@ -20,21 +20,25 @@ data/
 ├── images_training_rev1/      # directory of JPG images
 └── training_solutions_rev1.csv
 ```
-
 The CSV should contain a `GalaxyID` column followed by the 37 label columns. The scripts will automatically create a `filename` column by appending `.jpg` to `GalaxyID`.
 
 ## Training
 
-Run the training script to create a classifier. The model is based on Xception and is saved in Keras format.
+Run the training script to create a classifier. The dataset is automatically
+split into training, validation and test sets (70/15/15 by default). The model
+is based on Xception and is saved in Keras format. Test performance is reported
+after training.
 
 ```bash
 python train_model.py --csv data/training_solutions_rev1.csv \
                       --images data/images_training_rev1/ \
                       --epochs 50 --batch-size 32 \
+                      --val-split 0.15 --test-split 0.15 \
                       --model-out best_model.keras --plot-out training.png
 ```
 
-This will produce `best_model.keras` and an optional training plot.
+This will produce `best_model.keras`, save a training plot if requested, and
+print metrics on the held‑out test set.
 
 ## Feature Extraction
 
@@ -66,6 +70,5 @@ This will save cluster labels and a t-SNE plot.
 - `extract_features.py` – CLI for extracting features from images using a trained model.
 - `cluster_features.py` – CLI for clustering features and creating a t-SNE plot.
 - `galaxy/` – package containing reusable code for data loading, model construction, and analysis.
-- `unsupervised.ipynb` – original exploratory notebook retained for reference.
 
 Feel free to extend these scripts or integrate them into your own workflows.

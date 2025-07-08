@@ -10,10 +10,23 @@ def prepare_dataframe(csv_path: str) -> pd.DataFrame:
     return df
 
 
-def create_generators(df: pd.DataFrame, image_dir: str, batch_size: int = 32,
-                      val_split: float = 0.2):
-    """Create training and validation generators."""
-    train_df, val_df = train_test_split(df, test_size=val_split, random_state=42)
+def create_generators(
+    df: pd.DataFrame,
+    image_dir: str,
+    batch_size: int = 32,
+    val_split: float = 0.15,
+    test_split: float = 0.15,
+) -> tuple:
+    """Create training, validation, and test generators."""
+
+    if val_split + test_split >= 1.0:
+        raise ValueError("val_split + test_split must be less than 1.0")
+
+    train_df, temp_df = train_test_split(
+        df, test_size=val_split + test_split, random_state=42
+    )
+    val_size = val_split / (val_split + test_split)
+    val_df, test_df = train_test_split(temp_df, test_size=1 - val_size, random_state=42)
 
     label_cols = df.columns.tolist()[1:-1] if "filename" in df.columns else df.columns.tolist()[1:]
 
@@ -30,6 +43,7 @@ def create_generators(df: pd.DataFrame, image_dir: str, batch_size: int = 32,
     )
 
     val_datagen = ImageDataGenerator(rescale=1.0 / 255)
+    test_datagen = ImageDataGenerator(rescale=1.0 / 255)
 
     train_gen = train_datagen.flow_from_dataframe(
         dataframe=train_df,
@@ -55,4 +69,16 @@ def create_generators(df: pd.DataFrame, image_dir: str, batch_size: int = 32,
         target_size=(299, 299),
     )
 
-    return train_gen, val_gen
+    test_gen = test_datagen.flow_from_dataframe(
+        dataframe=test_df,
+        directory=image_dir,
+        x_col="filename",
+        y_col=label_cols,
+        batch_size=batch_size,
+        seed=42,
+        shuffle=False,
+        class_mode="raw",
+        target_size=(299, 299),
+    )
+
+    return train_gen, val_gen, test_gen
