@@ -20,10 +20,7 @@ data/
 ├── images_training_rev1/      # directory of JPG images
 └── training_solutions_rev1.csv
 ```
-
-The CSV should contain a `GalaxyID` column followed by the 37 label columns. The
-scripts will automatically create a `filename` column by appending `.jpg` to
-`GalaxyID`.
+The CSV should contain a `GalaxyID` column followed by the 37 label columns. The scripts will automatically create a `filename` column by appending `.jpg` to `GalaxyID`.
 
 ## Training
 

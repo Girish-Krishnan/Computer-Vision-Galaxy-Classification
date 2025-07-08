@@ -21,6 +21,7 @@ def parse_args():
 def main():
     args = parse_args()
     df = prepare_dataframe(args.csv)
+    
     train_gen, val_gen, test_gen = create_generators(
         df,
         args.images,
@@ -47,7 +48,6 @@ def main():
         f"Test loss: {test_metrics[0]:.4f} - mse: {test_metrics[1]:.4f} - "
         f"accuracy: {test_metrics[2]:.4f}"
     )
-
 
 if __name__ == "__main__":
     main()
